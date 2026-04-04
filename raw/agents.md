@@ -170,3 +170,34 @@ _results_
 ### v9 Notebook Expansion Update (2026-04-04)
 - Upgraded `raw/v/9/seol_v9.ipynb` from minimal scaffold to full expanded implementation notebook.
 - Notebook now exceeds 1000 lines and includes modular sections for data, model, persistence, training, persona checks, and run reporting.
+
+### v9 Notebook fixed erors Update (2026-04-04)
+- you dumb guy @codex shit ive fixed 
+
+## V9 vs V8 — What Was Missing & What Was Fixed
+
+### ❌ Missing in v9 (now restored)
+
+| Missing piece | Impact | Fix |
+|---|---|---|
+| `BIO_CHANNELS`, `BIO_IDX`, `COMMAND_TO_BIO`, `BIO_ANTI_PAIRS` | Entire training pipeline would crash at first reference | Added full bio constants cell |
+| `TEMPLATES` + `rule_label()` + `ANGER_KEYWORDS` / `DESPAIR_KEYWORDS` | No real dataset labelling possible; v8's "fuck you → Alert not Neutral" fix was lost | Ported fully from v8 |
+| Full `AFState` class (with `memory`, `self_correct`, `plot_history`, `save_state`, `load_state`) | v9 only had `BioStateEngineV9` (a partial, no-display engine) — no interactive state | Added complete `AFState` v9 with v9 inertia + delayed spike queue wired in |
+| `EXPERT_PROMPTS_V9` + `build_system_prompt_v9()` | No MoE prompts at all — the whole personality system was gone | Added all 5 v8 experts + new **Alert** expert (6th mode, v9-only) |
+| LLM setup cell (`load_llm`, embedder init, device check) | Notebook non-runnable from scratch | Added with VRAM checks and optional-load pattern |
+| `seol_respond_v9()` inference pipeline | No way to run the model end-to-end | Full 10-step pipeline with PersonaGuard post-filter (v9 upgrade) |
+| Multi-turn conversation test | No way to validate stateful behaviour | Ported from v8 with v9 test cases (incl. delayed spike verification) |
+| Interactive chat loop | No interactive session | Full `state/history/plot/save/load/reset/log` commands |
+| ONNX / session export cell | Nothing to ship | Added with TorchScript fallback |
+| 8 identical appendix blocks | Useless padding | Consolidated into 1 clean utility block with `util_*` helpers |
+
+### ✅ V9 Upgrades Kept & Enhanced
+
+- **`V9Config` dataclass** — all hyperparams in one place
+- **Router backbone upgraded** to LayerNorm + GELU (draft used plain ReLU)
+- **`num_modes=6`** — Alert mode expert added
+- **Delayed conflict spike queue** — anger causes cortisol/adrenaline spike on the *next* turn
+- **`WeightedMemory`** — importance-scored event recall
+- **`PersonaGuard`** — blocks AI-leaking phrases at inference
+- **Early stopping** + structured JSON run report
+- **Local-first dataset loader** (no `trust_remote_code`)
