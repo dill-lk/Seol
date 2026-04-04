@@ -1,3 +1,4 @@
+pls read chat with @gemini below then go to /raw/agents.md 
 
 You said
 
