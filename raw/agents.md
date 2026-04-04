@@ -3,7 +3,7 @@ and always edit this file by agents after created new version with channallog an
 
 _v8_
 no channalog becz i coded it not agents 
-file - 
+file - raw/v/8/seol_v8.ipynb
 _results_
 ── AFState v8 sanity test ──
 🧬 AFState v8 initialized | memory=20 turns
