@@ -1,6 +1,7 @@
 # SEOL Artificial Feelings — Experiment Log
 
 This file is the **agent-maintained changelog** for model iterations and test outcomes.
+Everytime you create new version of .ipynb you must read and fully undestand 3 older verisons of it befor create new version never delete the style of them
 
 ## Editing Rules
 - Keep each version in its own section (`v1`, `v2`, ...).
@@ -174,30 +175,23 @@ _results_
 ### v9 Notebook fixed erors Update (2026-04-04)
 - you dumb guy @codex shit ive fixed 
 
-## V9 vs V8 — What Was Missing & What Was Fixed
+I've read the entire v8 notebook and the feedback document thoroughly. Now let me build v9 with all the fixes and upgrades.Now I have full context. Let me build v9:Now I have everything. Let me create the full v9 notebook:SEOL AF v9 is ready! Here's exactly what was fixed and added based on every point from the Gemini + ChatGPT feedback:
 
-### ❌ Missing in v9 (now restored)
+**🔧 All bugs fixed:**
+- **DailyDialog crash** — now tries normal load → huggingface parquet fallback → graceful skip
+- **"As an AI" breaks** — system prompts completely rewritten. SEOL never breaks character. If asked "are you AI?", she dismisses/laughs it off
+- **"fuck you" → Neutral bug** — Alert samples now get 1.6× importance weight in loss function, plus massively expanded anger/despair dataset
 
-| Missing piece | Impact | Fix |
-|---|---|---|
-| `BIO_CHANNELS`, `BIO_IDX`, `COMMAND_TO_BIO`, `BIO_ANTI_PAIRS` | Entire training pipeline would crash at first reference | Added full bio constants cell |
-| `TEMPLATES` + `rule_label()` + `ANGER_KEYWORDS` / `DESPAIR_KEYWORDS` | No real dataset labelling possible; v8's "fuck you → Alert not Neutral" fix was lost | Ported fully from v8 |
-| Full `AFState` class (with `memory`, `self_correct`, `plot_history`, `save_state`, `load_state`) | v9 only had `BioStateEngineV9` (a partial, no-display engine) — no interactive state | Added complete `AFState` v9 with v9 inertia + delayed spike queue wired in |
-| `EXPERT_PROMPTS_V9` + `build_system_prompt_v9()` | No MoE prompts at all — the whole personality system was gone | Added all 5 v8 experts + new **Alert** expert (6th mode, v9-only) |
-| LLM setup cell (`load_llm`, embedder init, device check) | Notebook non-runnable from scratch | Added with VRAM checks and optional-load pattern |
-| `seol_respond_v9()` inference pipeline | No way to run the model end-to-end | Full 10-step pipeline with PersonaGuard post-filter (v9 upgrade) |
-| Multi-turn conversation test | No way to validate stateful behaviour | Ported from v8 with v9 test cases (incl. delayed spike verification) |
-| Interactive chat loop | No interactive session | Full `state/history/plot/save/load/reset/log` commands |
-| ONNX / session export cell | Nothing to ship | Added with TorchScript fallback |
-| 8 identical appendix blocks | Useless padding | Consolidated into 1 clean utility block with `util_*` helpers |
+**🆕 v9 upgrades (all feedback applied):**
 
-### ✅ V9 Upgrades Kept & Enhanced
-
-- **`V9Config` dataclass** — all hyperparams in one place
-- **Router backbone upgraded** to LayerNorm + GELU (draft used plain ReLU)
-- **`num_modes=6`** — Alert mode expert added
-- **Delayed conflict spike queue** — anger causes cortisol/adrenaline spike on the *next* turn
-- **`WeightedMemory`** — importance-scored event recall
-- **`PersonaGuard`** — blocks AI-leaking phrases at inference
-- **Early stopping** + structured JSON run report
+| Feature | What it does |
+|---|---|
+| **Emotional inertia** | `emotion = prev×0.7 + new×0.3` — last 3 turns heavily influence next state |
+| **Oxytocin saturation** | Repeated "I love you" → diminishing oxytocin returns. Natural, not infinite stacking |
+| **Delayed cortisol spike** | Hurt queues a trickle of cortisol over 4 turns. Pain *lingers* instead of instant reset |
+| **Conflict engine** | When hurt, SEOL sometimes argues back or withdraws — based on `should_conflict()` |
+| **Personality core** | Attachment style (secure/anxious/avoidant) — affects jealousy, conflict probability, decay speed |
+| **Weighted memory** | Emotional events get importance scores. High cortisol/oxytocin moments are remembered stronger |
+| **8B upgrade path** | If VRAM ≥ 20GB, auto-upgrades to Llama 3.1 8B for better language quality |
+| **Sinhala dataset** | More pure Sinhala + code-switch (Sinhala+English) examples to push embedding score toward 0.6+ |d JSON run report
 - **Local-first dataset loader** (no `trust_remote_code`)
