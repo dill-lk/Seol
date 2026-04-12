@@ -1,0 +1,120 @@
+name: Build & Release
+
+# Trigger: push to main (i.e. a PR has been merged).
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write   # needed to create releases and upload assets
+
+jobs:
+  # ── Typecheck ──────────────────────────────────────────────────────────────
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: TypeScript check
+        run: npm run typecheck
+
+  # ── Build distributables ───────────────────────────────────────────────────
+  build:
+    name: Build (${{ matrix.os }})
+    needs: typecheck
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            script: dist:win
+            artifact-pattern: 'packages/app/release/**/*.exe'
+            artifact-name: seol-windows
+          - os: macos-latest
+            script: dist:mac
+            artifact-pattern: 'packages/app/release/**/*.dmg'
+            artifact-name: seol-macos
+          - os: ubuntu-latest
+            script: dist:linux
+            artifact-pattern: 'packages/app/release/**/*.AppImage'
+            artifact-name: seol-linux
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Electron distributable
+        run: npm -w packages/app run ${{ matrix.script }}
+        env:
+          # Suppress electron-builder telemetry
+          ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: 'true'
+          # Required on Linux for virtual display (AppImage build)
+          DISPLAY: ':99.0'
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-pattern }}
+          if-no-files-found: error
+          retention-days: 7
+
+  # ── Create GitHub Release ──────────────────────────────────────────────────
+  release:
+    name: Publish Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./packages/app/package.json').version")
+          echo "version=v${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: List release assets
+        run: find release-assets -type f | sort
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}-${{ github.run_number }}
+          name: SEOL ${{ steps.version.outputs.version }} (#${{ github.run_number }})
+          body: |
+            Automated release built from commit ${{ github.sha }}.
+
+            | Platform | Installer |
+            |----------|-----------|
+            | Windows  | `.exe` (NSIS) |
+            | macOS    | `.dmg` |
+            | Linux    | `.AppImage` |
+          draft: false
+          prerelease: false
+          files: release-assets/**/*
