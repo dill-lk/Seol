@@ -3,6 +3,8 @@ import { computed, ref } from 'vue'
 import {
   applyCommand,
   classifyCommand,
+  emotionalSummary,
+  feelingIntensity,
   homeostasisTick,
   initialBioState,
   modeToEmotion,
@@ -44,11 +46,17 @@ export const useSeolStore = defineStore('seol', () => {
   // Bio-state (reactive)
   const bioState = ref<BioState>(initialBioState())
 
+  // v8: alert streak for trauma amplification; last state for memory-based self-correction
+  const alertStreak = ref(0)
+  const lastBioState = ref<BioState | undefined>(undefined)
+
   // Derived: mode and emotion — computed from bio-state
   const mode = computed<SEOLMode>(() => resolveMode(bioState.value))
   const emotionState = computed(() => modeToEmotion(mode.value, bioState.value))
   const currentEmotion = computed<VRMEmotion>(() => emotionState.value.emotion)
   const emotionIntensity = computed<number>(() => emotionState.value.intensity)
+  // v8: overall bio-state intensity (used by VrmViewer / BioHud)
+  const bioIntensity = computed<number>(() => feelingIntensity(bioState.value))
 
   // Chat
   const turns = ref<ChatTurn[]>([])
@@ -64,9 +72,36 @@ export const useSeolStore = defineStore('seol', () => {
 
     // 1. Classify & update bio-state
     const command = classifyCommand(text)
-    bioState.value = applyCommand(bioState.value, command)
-    bioState.value = selfCorrect(bioState.value, text)
-    bioState.value = homeostasisTick(bioState.value)
+
+    // v8: snapshot state before change (used for memory-based self-correction)
+    const prevState = { ...bioState.value }
+
+    // v8: trauma amplification — repeated Alert/Anger commands compound cortisol
+    if (command === 'Alert' || command === 'Anger') {
+      alertStreak.value += 1
+    }
+    else {
+      alertStreak.value = 0
+    }
+
+    let nextState = applyCommand(bioState.value, command)
+
+    // v8: trauma amplification — if on an alert streak, extra cortisol/adrenaline spike
+    if (alertStreak.value >= 2 && (command === 'Alert' || command === 'Anger')) {
+      const TRAUMA = 0.25 * Math.min(alertStreak.value - 1, 3)
+      nextState = {
+        ...nextState,
+        cortisol:   Math.min(1, nextState.cortisol   + TRAUMA),
+        adrenaline: Math.min(1, nextState.adrenaline + TRAUMA * 0.8),
+      }
+    }
+
+    // v8: memory-based self-correction (blend back to pre-spike state on JK)
+    nextState = selfCorrect(nextState, text, prevState)
+    nextState = homeostasisTick(nextState)
+
+    bioState.value = nextState
+    lastBioState.value = prevState
 
     // 2. Push user turn
     const stamp = Date.now().toString()
@@ -97,6 +132,7 @@ export const useSeolStore = defineStore('seol', () => {
         settings.ollamaModel,
         mode.value,
         bioState.value,
+        emotionalSummary(bioState.value),
         llmHistory.value,
         text,
       )) {
@@ -129,6 +165,8 @@ export const useSeolStore = defineStore('seol', () => {
     turns.value = []
     llmHistory.value = []
     bioState.value = initialBioState()
+    alertStreak.value = 0
+    lastBioState.value = undefined
   }
 
   return {
@@ -136,6 +174,7 @@ export const useSeolStore = defineStore('seol', () => {
     mode,
     currentEmotion,
     emotionIntensity,
+    bioIntensity,
     turns,
     isGenerating,
     sendMessage,

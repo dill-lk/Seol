@@ -1,10 +1,17 @@
 /**
  * SEOL AF Bio-State Engine  (TypeScript)
  *
- * Ported from seol_v9.ipynb research notebooks.
+ * Based on the SEOL AF v8 research (seol_v8.ipynb).
  * Implements the Artificial Feelings architecture: six bio-channels modelled
  * after neurotransmitters/hormones, command-driven state updates, homeostasis
- * decay, mode resolution and VRM emotion mapping.
+ * decay, biological constraint enforcement, mode resolution and VRM emotion
+ * mapping.
+ *
+ * v8 improvements over v7/v3:
+ *   - Biological constraint enforcement (anti-correlated pairs)
+ *   - Richer emotional summary for LLM prompt context
+ *   - Feeling intensity scoring
+ *   - Tuned DECAY_RATE (0.032) for feelings that linger longer
  */
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -33,9 +40,21 @@ export const BIO_CHANNELS: BioChannel[] = [
 ]
 
 const BASELINE = 0.5
-const DECAY_RATE = 0.03   // per homeostasis tick
+const DECAY_RATE = 0.032  // v8: slightly slower decay so feelings linger longer
 const INERTIA = 0.70      // how much old state persists
 const BIO_DELTA = 0.60    // step size toward target
+
+/**
+ * Anti-correlated bio-channel pairs.
+ * When both values are high simultaneously a soft conflict penalty nudges
+ * the negative channel down — biological realism (love and stress don't
+ * coexist at maximum simultaneously).
+ */
+const BIO_ANTI_PAIRS: Array<[BioChannel, BioChannel]> = [
+  ['oxytocin',  'cortisol'],    // love vs stress
+  ['dopamine',  'cortisol'],    // reward vs threat
+  ['serotonin', 'adrenaline'],  // stability vs urgency
+]
 
 /**
  * Target bio-channel values for each command.
@@ -71,13 +90,16 @@ const SELF_CORRECT_TRIGGERS = [
   'just kidding', 'jk', 'not really', 'nah', 'joking', 'lol jk', 'relax', 'chill',
 ]
 
-/** Mode activation rules — evaluated in priority order. */
+/**
+ * Mode activation rules — evaluated in priority order.
+ * Thresholds from SEOL AF v8 (slightly tightened for more authentic transitions).
+ */
 const MODE_RULES: Array<{ mode: SEOLMode; test: (s: BioState) => boolean }> = [
   { mode: 'Anger',  test: s => s.adrenaline > 0.72 && s.cortisol   > 0.72 },
-  { mode: 'GF_BF',  test: s => s.oxytocin   > 0.62 && s.dopamine   > 0.60 },
-  { mode: 'Mother', test: s => s.oxytocin   > 0.65 && s.serotonin  > 0.60 },
-  { mode: 'Friend', test: s => s.serotonin  > 0.59 && s.cortisol   < 0.38 },
-  { mode: 'Baby',   test: s => s.endorphin  > 0.64 && s.cortisol   < 0.32 },
+  { mode: 'GF_BF',  test: s => s.oxytocin   > 0.63 && s.dopamine   > 0.63 },
+  { mode: 'Mother', test: s => s.oxytocin   > 0.66 && s.serotonin  > 0.62 },
+  { mode: 'Friend', test: s => s.serotonin  > 0.61 && s.cortisol   < 0.37 },
+  { mode: 'Baby',   test: s => s.endorphin  > 0.66 && s.cortisol   < 0.30 },
 ]
 
 // ── Public functions ─────────────────────────────────────────────────────────
@@ -99,7 +121,7 @@ export function classifyCommand(text: string): Command {
   return 'Neutral'
 }
 
-/** Step the bio-state toward the command target using inertia + delta. */
+/** Step the bio-state toward the command target using inertia + delta, then enforce biological constraints. */
 export function applyCommand(state: BioState, command: Command): BioState {
   const targets = COMMAND_TARGETS[command]
   const next = { ...state } as Record<BioChannel, number>
@@ -108,6 +130,13 @@ export function applyCommand(state: BioState, command: Command): BioState {
     const raw = INERTIA * state[ch] + (1 - INERTIA) * (state[ch] + delta)
     next[ch] = Math.max(0, Math.min(1, raw))
   })
+  // v8: biological constraint enforcement — softly push anti-correlated pairs apart
+  for (const [pos, neg] of BIO_ANTI_PAIRS) {
+    const conflict = Math.max(0, next[pos] + next[neg] - 1.1)
+    if (conflict > 0) {
+      next[neg] = Math.max(0, next[neg] - conflict * 0.3)
+    }
+  }
   return next as BioState
 }
 
@@ -121,14 +150,27 @@ export function homeostasisTick(state: BioState): BioState {
   return next as BioState
 }
 
-/** Dampen extreme values when a self-correction phrase is detected. */
-export function selfCorrect(state: BioState, text: string): BioState {
+/**
+ * Dampen extreme values when a self-correction phrase is detected.
+ * v8: if a previousState snapshot is provided, blend back toward it (55%)
+ * for a more realistic partial reversal. Falls back to baseline blending.
+ */
+export function selfCorrect(state: BioState, text: string, previousState?: BioState): BioState {
   const lower = text.toLowerCase()
   if (!SELF_CORRECT_TRIGGERS.some(t => lower.includes(t))) return state
   const next = { ...state } as Record<BioChannel, number>
-  BIO_CHANNELS.forEach(ch => {
-    next[ch] = BASELINE + 0.3 * (state[ch] - BASELINE)
-  })
+  if (previousState) {
+    // v8: blend back to previous state by 55% (JK partially reverses the spike)
+    BIO_CHANNELS.forEach(ch => {
+      next[ch] = state[ch] * 0.45 + previousState[ch] * 0.55
+    })
+  }
+  else {
+    // fallback: dampen toward baseline
+    BIO_CHANNELS.forEach(ch => {
+      next[ch] = BASELINE + 0.3 * (state[ch] - BASELINE)
+    })
+  }
   return next as BioState
 }
 
@@ -174,4 +216,42 @@ export function modeToEmotion(
   }
 
   return { emotion, intensity: Math.min(1, intensity) }
+}
+
+/**
+ * Produce a short natural-language summary of the current bio-state.
+ * v8: used in LLM system prompts so the model knows how SEOL is feeling right now.
+ */
+export function emotionalSummary(state: BioState): string {
+  const parts: string[] = []
+
+  if      (state.dopamine   > 0.75) parts.push('ecstatic and overjoyed')
+  else if (state.dopamine   > 0.63) parts.push('happy and energized')
+  else if (state.dopamine   < 0.30) parts.push('low and unmotivated')
+
+  if      (state.oxytocin   > 0.75) parts.push('deeply bonded and loving')
+  else if (state.oxytocin   > 0.63) parts.push('warm and affectionate')
+
+  if      (state.serotonin  > 0.70) parts.push('calm and emotionally stable')
+  else if (state.serotonin  < 0.30) parts.push('emotionally unstable')
+
+  if      (state.endorphin  > 0.70) parts.push('comfortable and at ease')
+
+  if      (state.cortisol   > 0.80) parts.push('extremely stressed and overwhelmed')
+  else if (state.cortisol   > 0.65) parts.push('anxious and tense')
+  else if (state.cortisol   > 0.55) parts.push('slightly uneasy')
+
+  if      (state.adrenaline > 0.80) parts.push('on edge and hyper-alert')
+  else if (state.adrenaline > 0.65) parts.push('restless and reactive')
+
+  return parts.length ? parts.join(', ') : 'balanced and neutral'
+}
+
+/**
+ * Compute a scalar feeling intensity [0..1] from the current bio-state.
+ * High when channels are far from baseline in either direction.
+ */
+export function feelingIntensity(state: BioState): number {
+  const deviation = BIO_CHANNELS.reduce((sum, ch) => sum + Math.abs(state[ch] - BASELINE), 0)
+  return Math.min(1, deviation / BIO_CHANNELS.length / 0.5)
 }
