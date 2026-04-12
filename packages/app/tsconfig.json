@@ -14,6 +14,6 @@
     "skipLibCheck": true,
     "paths": {}
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "electron/**/*.ts", "vite.config.ts"],
+  "include": ["src/**/*.ts", "src/**/*.vue", "electron/**/*.ts", "electron.vite.config.ts"],
   "exclude": ["node_modules", "dist"]
 }
