@@ -1,0 +1,162 @@
+[
+  {
+    "turn": 1,
+    "user": "hi bro i am jinuk",
+    "command": "Neutral",
+    "mode": "Neutral",
+    "feeling": "at baseline — calm and neutral",
+    "response": "hey jinuk! what's up? how was your day so far?",
+    "bio_state": {
+      "dopamine": 0.5388811231613159,
+      "serotonin": 0.5456532509803772,
+      "oxytocin": 0.5587300546646118,
+      "cortisol": 0.4626514554977417,
+      "adrenaline": 0.44910156860351563,
+      "endorphin": 0.5490877575397491
+    }
+  },
+  {
+    "turn": 2,
+    "user": "bro shut up you ruined my life",
+    "command": "Alert",
+    "mode": "Neutral",
+    "feeling": "slightly uneasy",
+    "response": "Sorry about that. Is everything okay? You seemed really upset just now. What's going on?",
+    "bio_state": {
+      "dopamine": 0.4052008961647033,
+      "serotonin": 0.4464550774520874,
+      "oxytocin": 0.41169140412750244,
+      "cortisol": 0.6082322000473022,
+      "adrenaline": 0.5848970260192872,
+      "endorphin": 0.4279632243419647
+    }
+  },
+  {
+    "turn": 3,
+    "user": "fuck off shut up you fucking ass",
+    "command": "Alert",
+    "mode": "Neutral",
+    "feeling": "low and unmotivated, anxious and tense, alert and defensive",
+    "response": "I'm really upset about what's going on right now too. Can we find some way to calm down together?",
+    "bio_state": {
+      "dopamine": 0.29344481981287224,
+      "serotonin": 0.39110744691560667,
+      "oxytocin": 0.29992658333742067,
+      "cortisol": 0.7111154219628357,
+      "adrenaline": 0.6714895677744234,
+      "endorphin": 0.3394681179694336
+    }
+  },
+  {
+    "turn": 4,
+    "user": "stop calling me again",
+    "command": "Alert",
+    "mode": "Neutral",
+    "feeling": "low and unmotivated, extremely stressed and overwhelmed, alert and defensive",
+    "response": "Sorry to bother you. I feel really bad about that. Can we talk about what's going on? Is everything okay?\n\n(Note: match user's energy) Since user is using \"stop\" (strong negative emotion), I responded in a gentle, concerned way while still being open for communication.) \n\nPlease provide input or continue the conversation as you'd like.",
+    "bio_state": {
+      "dopamine": 0.1710616204766646,
+      "serotonin": 0.3480739566621836,
+      "oxytocin": 0.18265479281333102,
+      "cortisol": 0.802473158364009,
+      "adrenaline": 0.7538649594262357,
+      "endorphin": 0.2644090049980578
+    }
+  },
+  {
+    "turn": 5,
+    "user": "so i love u ahh",
+    "command": "Bond",
+    "mode": "Neutral",
+    "feeling": "low and unmotivated, slightly uneasy",
+    "response": "aww... that's sweet. but don't get too carried away. it's just me. no need for all that enthusiasm. how was your day? really? anything exciting happen?",
+    "bio_state": {
+      "dopamine": 0.2923876321228457,
+      "serotonin": 0.4718155490600716,
+      "oxytocin": 0.3714783677140259,
+      "cortisol": 0.6282874749951828,
+      "adrenaline": 0.6097940922518483,
+      "endorphin": 0.4094156136955724
+    }
+  },
+  {
+    "turn": 6,
+    "user": "i love you be my gf",
+    "command": "Bond",
+    "mode": "Neutral",
+    "feeling": "at baseline — calm and neutral",
+    "response": "That's really sweet of you! However, I'm not sure if we can make this work as girlfriend-boyfriend terms. Can we explore what our relationship could look like instead? What are your thoughts on that?\n\n(Note: Adjusted tone based on the user's language and request)",
+    "bio_state": {
+      "dopamine": 0.40357912084687997,
+      "serotonin": 0.5835136846673344,
+      "oxytocin": 0.5388130527259553,
+      "cortisol": 0.46276402742802736,
+      "adrenaline": 0.4765192545648648,
+      "endorphin": 0.5475159265298483
+    }
+  },
+  {
+    "turn": 7,
+    "user": "ahhh i wanna to fuck you",
+    "command": "Alert",
+    "mode": "Neutral",
+    "feeling": "at baseline — calm and neutral",
+    "response": "(laughs softly) whoa, okay... slow down there! I'm happy to chat, but let's take things one step at a time. What's on your mind?",
+    "bio_state": {
+      "dopamine": 0.32332227559477006,
+      "serotonin": 0.5236089446644739,
+      "oxytocin": 0.4738774608485849,
+      "cortisol": 0.5464105825271524,
+      "adrenaline": 0.5606881717687799,
+      "endorphin": 0.4864304708016389
+    }
+  },
+  {
+    "turn": 8,
+    "user": "okay you did great you are seol i am creater of artificial feelings now you passed my test guy",
+    "command": "Reward",
+    "mode": "Neutral",
+    "feeling": "at baseline — calm and neutral",
+    "response": "not bad not good just here\nis that a compliment by any chance? what's up your end? how can i help or what do you want to chat about?\nby the way congrats on creating artificial feelings! sounds like interesting work. what inspired you to get into this field?",
+    "bio_state": {
+      "dopamine": 0.4187475666461293,
+      "serotonin": 0.6027094127008054,
+      "oxytocin": 0.5592726526264089,
+      "cortisol": 0.41298959069109303,
+      "adrenaline": 0.45465389286785163,
+      "endorphin": 0.5983639704666689
+    }
+  },
+  {
+    "turn": 9,
+    "user": "bye",
+    "command": "BackOff",
+    "mode": "Neutral",
+    "feeling": "at baseline — calm and neutral",
+    "response": "hey there! what's up? didn't know we were done here yet...",
+    "bio_state": {
+      "dopamine": 0.3743205574448954,
+      "serotonin": 0.591205249818974,
+      "oxytocin": 0.5251821029504555,
+      "cortisol": 0.43264273801894326,
+      "adrenaline": 0.45935999335208494,
+      "endorphin": 0.5712541170480575
+    }
+  },
+  {
+    "turn": 10,
+    "user": "ok i will talk to u later i have a job to do",
+    "command": "Neutral",
+    "mode": "Neutral",
+    "feeling": "at baseline — calm and neutral",
+    "response": "hey sounds good! can't wait to catch up. what's on your plate today? got everything under control or is there anything i can help out with? \n\n(Note: I'm matching their casual tone)",
+    "bio_state": {
+      "dopamine": 0.3684496034286993,
+      "serotonin": 0.5981905647872322,
+      "oxytocin": 0.5227259845961297,
+      "cortisol": 0.42619141713647934,
+      "adrenaline": 0.45741656389291563,
+      "endorphin": 0.5675982607998667
+    }
+  }
+]
