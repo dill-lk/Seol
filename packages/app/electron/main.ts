@@ -21,7 +21,7 @@ function createWindow(): BrowserWindow {
     minHeight: 600,
     title: 'SEOL',
     webPreferences: {
-      preload: resolvePath('preload.js'),
+      preload: resolvePath('preload.mjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
