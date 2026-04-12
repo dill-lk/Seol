@@ -1,13 +1,37 @@
 <template>
   <div class="vrm-wrapper">
     <canvas ref="canvasRef" class="vrm-canvas" />
-    <div v-if="!props.modelUrl" class="vrm-placeholder">
-      <p>🎭</p>
-      <p>No VRM loaded</p>
-      <p class="hint">Paste a VRM URL in Settings</p>
-    </div>
-    <div v-if="loadError" class="vrm-error">⚠ {{ loadError }}</div>
-    <div v-if="isLoading" class="vrm-loading">Loading model…</div>
+
+    <!-- Beautiful placeholder when no model is loaded -->
+    <Transition name="ph-fade">
+      <div v-if="!props.modelUrl" class="vrm-placeholder">
+        <div class="ph-orb" />
+        <div class="ph-rings">
+          <div class="ph-ring ph-ring--1" />
+          <div class="ph-ring ph-ring--2" />
+          <div class="ph-ring ph-ring--3" />
+        </div>
+        <div class="ph-content">
+          <span class="ph-icon">🎭</span>
+          <p class="ph-title">No character loaded</p>
+          <p class="ph-hint">Paste a VRM URL in ⚙ Settings to bring SEOL to life</p>
+        </div>
+      </div>
+    </Transition>
+
+    <Transition name="ph-fade">
+      <div v-if="loadError" class="vrm-error">
+        <span class="err-icon">⚠</span>
+        <span>{{ loadError }}</span>
+      </div>
+    </Transition>
+
+    <Transition name="ph-fade">
+      <div v-if="isLoading" class="vrm-loading">
+        <div class="loading-spinner" />
+        <span>Loading model…</span>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -206,8 +230,142 @@ onUnmounted(() => {
   height: 100%;
 }
 
-.vrm-placeholder,
-.vrm-error,
+/* ── Placeholder ────────────────────────────────────────────────────────────── */
+.vrm-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 60%, rgba(80, 40, 140, 0.18) 0%, transparent 65%),
+              radial-gradient(ellipse at 30% 30%, rgba(40, 60, 160, 0.12) 0%, transparent 55%),
+              #07070f;
+  pointer-events: none;
+}
+
+/* Glowing central orb */
+.ph-orb {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(120, 70, 220, 0.28) 0%, rgba(80, 40, 160, 0.14) 45%, transparent 70%);
+  animation: orb-pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes orb-pulse {
+  0%, 100% { transform: scale(1);   opacity: 0.7; }
+  50%       { transform: scale(1.2); opacity: 1;   }
+}
+
+/* Concentric rotating rings */
+.ph-rings {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  pointer-events: none;
+}
+
+.ph-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid transparent;
+}
+
+.ph-ring--1 {
+  border-color: rgba(160, 100, 255, 0.22);
+  animation: ring-spin 9s linear infinite;
+  background: conic-gradient(from 0deg, transparent 60%, rgba(160,100,255,0.18) 100%);
+}
+
+.ph-ring--2 {
+  inset: 20px;
+  border-color: rgba(100, 140, 255, 0.18);
+  animation: ring-spin 14s linear infinite reverse;
+  background: conic-gradient(from 120deg, transparent 60%, rgba(100,140,255,0.14) 100%);
+}
+
+.ph-ring--3 {
+  inset: 40px;
+  border-color: rgba(200, 160, 255, 0.14);
+  animation: ring-spin 20s linear infinite;
+}
+
+@keyframes ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Text content above the orb */
+.ph-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 20px;
+}
+
+.ph-icon {
+  font-size: 52px;
+  filter: drop-shadow(0 0 18px rgba(160, 100, 255, 0.55));
+  animation: icon-float 3s ease-in-out infinite;
+}
+
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0);    }
+  50%       { transform: translateY(-8px); }
+}
+
+.ph-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: rgba(220, 200, 255, 0.80);
+  letter-spacing: 0.03em;
+  margin: 0;
+}
+
+.ph-hint {
+  font-size: 12px;
+  color: rgba(180, 170, 210, 0.42);
+  max-width: 220px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Error ──────────────────────────────────────────────────────────────────── */
+.vrm-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(20, 5, 5, 0.60);
+  backdrop-filter: blur(4px);
+}
+
+.err-icon {
+  font-size: 28px;
+  color: #ff7070;
+}
+
+.vrm-error span:last-child {
+  font-size: 13px;
+  color: #ff9090;
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+/* ── Loading ────────────────────────────────────────────────────────────────── */
 .vrm-loading {
   position: absolute;
   inset: 0;
@@ -215,18 +373,30 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  pointer-events: none;
-  color: rgba(232,232,240,0.45);
-  font-size: 14px;
-  text-align: center;
+  gap: 14px;
+  background: rgba(7, 7, 15, 0.70);
+  backdrop-filter: blur(4px);
+  font-size: 13px;
+  color: rgba(200, 185, 255, 0.75);
+  letter-spacing: 0.04em;
 }
 
-.vrm-placeholder p:first-child { font-size: 48px; }
-.vrm-placeholder .hint { font-size: 12px; opacity: 0.55; }
-
-.vrm-error {
-  color: #ff6b6b;
-  padding: 16px;
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(160, 100, 255, 0.20);
+  border-top-color: rgba(160, 100, 255, 0.80);
+  animation: spin 0.9s linear infinite;
 }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Transitions ────────────────────────────────────────────────────────────── */
+.ph-fade-enter-active,
+.ph-fade-leave-active { transition: opacity 0.35s ease; }
+.ph-fade-enter-from,
+.ph-fade-leave-to     { opacity: 0; }
 </style>

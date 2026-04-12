@@ -1,5 +1,18 @@
 <template>
   <div class="chat-panel">
+    <!-- Character header -->
+    <div class="chat-header">
+      <div class="header-left">
+        <span class="char-name">SEOL</span>
+        <span class="char-mode">{{ modeLabel }}</span>
+      </div>
+      <div class="header-right">
+        <span class="emotion-pill" :class="`emotion-${store.currentEmotion}`">
+          {{ emotionEmoji }} {{ store.currentEmotion }}
+        </span>
+      </div>
+    </div>
+
     <!-- Message list -->
     <div ref="scrollRef" class="messages">
       <div
@@ -58,6 +71,27 @@ const lastTurnIsUser = computed(() => {
   return last?.role === 'user'
 })
 
+const MODE_LABELS: Record<string, string> = {
+  GF_BF:   'Romantic',
+  Mother:  'Caring',
+  Friend:  'Friendly',
+  Baby:    'Playful',
+  Anger:   'Upset',
+  Neutral: 'Neutral',
+}
+
+const EMOTION_EMOJI: Record<string, string> = {
+  happy:     '😊',
+  sad:       '😢',
+  angry:     '😠',
+  surprised: '😲',
+  neutral:   '😐',
+  think:     '🤔',
+}
+
+const modeLabel = computed(() => MODE_LABELS[store.mode] ?? store.mode)
+const emotionEmoji = computed(() => EMOTION_EMOJI[store.currentEmotion] ?? '😐')
+
 async function onSend() {
   const text = inputText.value.trim()
   if (!text || store.isGenerating) return
@@ -97,6 +131,56 @@ watch(
   backdrop-filter: blur(12px);
   border-left: 1px solid rgba(255,255,255,0.07);
 }
+
+/* ── Character header ─────────────────────────────────────────────────────── */
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.02);
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.char-name {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: #c8b8ff;
+  line-height: 1.2;
+}
+
+.char-mode {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.emotion-pill {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55);
+  white-space: nowrap;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.emotion-happy    { border-color: rgba(100,220,130,0.35); color: rgba(130,255,160,0.80); background: rgba(60,180,90,0.08); }
+.emotion-sad      { border-color: rgba(100,140,255,0.35); color: rgba(140,170,255,0.80); background: rgba(60,100,200,0.08); }
+.emotion-angry    { border-color: rgba(255,100,80,0.35);  color: rgba(255,140,120,0.80); background: rgba(200,60,40,0.08); }
+.emotion-surprised { border-color: rgba(255,200,80,0.35); color: rgba(255,220,130,0.80); background: rgba(200,150,40,0.08); }
+.emotion-neutral  { border-color: rgba(160,140,200,0.25); color: rgba(200,190,230,0.65); background: rgba(100,90,140,0.06); }
+.emotion-think    { border-color: rgba(180,160,255,0.30); color: rgba(200,185,255,0.75); background: rgba(120,100,200,0.07); }
 
 /* Messages */
 .messages {

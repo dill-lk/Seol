@@ -1,5 +1,8 @@
 <template>
   <div class="app-shell">
+    <!-- Ambient background gradient -->
+    <div class="ambient-bg" aria-hidden="true" />
+
     <!-- 3-D model fills the left/center area -->
     <div class="scene-area">
       <VrmViewer :model-url="settings.vrmUrl" />
@@ -41,12 +44,34 @@ const showSettings = ref(false)
   display: flex;
   height: 100vh;
   overflow: hidden;
+  position: relative;
+}
+
+/* Ambient background — slow-drifting colour clouds */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 55% at 35% 65%, rgba(72, 32, 140, 0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 45% at 70% 30%, rgba(30, 50, 160, 0.16) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 40% at 20% 20%, rgba(120, 60, 200, 0.10) 0%, transparent 60%),
+    #07070f;
+  animation: ambient-drift 28s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes ambient-drift {
+  0%   { filter: hue-rotate(0deg)   brightness(1.00); }
+  50%  { filter: hue-rotate(12deg)  brightness(1.04); }
+  100% { filter: hue-rotate(-8deg)  brightness(0.97); }
 }
 
 .scene-area {
   flex: 1;
   position: relative;
   min-width: 0;
+  z-index: 1;
 }
 
 .chat-area {
@@ -54,6 +79,8 @@ const showSettings = ref(false)
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 /* HUD overlay */
@@ -83,9 +110,12 @@ const showSettings = ref(false)
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(8px);
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.2s;
 }
 
-.gear-btn:hover { background: rgba(255,255,255,0.10); }
+.gear-btn:hover {
+  background: rgba(255,255,255,0.10);
+  transform: rotate(30deg);
+}
 </style>
 
