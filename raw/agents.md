@@ -3,7 +3,12 @@
 !!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust
 !!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust
 !!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust
-!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust
+!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust 
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
 
 This file is the **agent-maintained changelog** for model iterations and test outcomes.
 Everytime you create new version of .ipynb you must read and fully undestand 3 older verisons of it befor create new version never delete the style of them
