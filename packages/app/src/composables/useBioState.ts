@@ -255,3 +255,17 @@ export function feelingIntensity(state: BioState): number {
   const deviation = BIO_CHANNELS.reduce((sum, ch) => sum + Math.abs(state[ch] - BASELINE), 0)
   return Math.min(1, deviation / BIO_CHANNELS.length / 0.5)
 }
+
+/**
+ * Compute an importance score [0..1] for a bio-state snapshot.
+ * v10 RIW (Relational Importance Weighting): high-emotion turns are retained
+ * longer in the LLM context window than neutral low-emotion turns.
+ *
+ * @param state    Bio-state at the time of the turn
+ * @param command  Classified command for the turn
+ */
+export function importanceScore(state: BioState, command: Command): number {
+  const intensity = feelingIntensity(state)
+  const commandBonus = command !== 'Neutral' ? 0.20 : 0
+  return Math.min(1, intensity * 0.80 + commandBonus)
+}

@@ -6,12 +6,14 @@ import {
   emotionalSummary,
   feelingIntensity,
   homeostasisTick,
+  importanceScore,
   initialBioState,
   modeToEmotion,
   resolveMode,
   selfCorrect,
 } from '../composables/useBioState'
 import type { BioState, Command, SEOLMode, VRMEmotion } from '../composables/useBioState'
+import { circadianTick } from '../composables/useCircadian'
 import type { ChatMessage } from '../composables/useOllama'
 import { cleanResponse, streamChat } from '../composables/useOllama'
 import { useSettingsStore } from './settings'
@@ -25,6 +27,46 @@ export interface ChatTurn {
   command?: Command
   mode?: SEOLMode
   streaming?: boolean
+  /** v10 RIW: importance score [0..1] — high-emotion turns live longer in LLM context */
+  importance: number
+}
+
+// ── RIW: importance-weighted LLM history entry ────────────────────────────────
+
+interface ScoredMessage {
+  msg: ChatMessage
+  score: number
+}
+
+/** Max scored messages kept in the history pool (10 exchanges). */
+const MAX_HISTORY_POOL = 20
+
+/** Max messages fed to the LLM per turn (8 = 4 exchanges). */
+const MAX_LLM_CONTEXT = 8
+
+/**
+ * v10 RIW (Relational Importance Weighting) — build a context window that
+ * always includes the most recent exchange plus the highest-importance turns
+ * from history.  Ensures emotionally significant moments persist in context
+ * longer than neutral filler.
+ */
+function buildRiwHistory(history: ScoredMessage[], max = MAX_LLM_CONTEXT): ChatMessage[] {
+  if (history.length <= max) return history.map(h => h.msg)
+
+  // Always keep the last 4 messages (2 most-recent exchanges)
+  const tail = history.slice(-4)
+  const head = history.slice(0, -4)
+  const slots = max - 4
+
+  if (slots <= 0 || head.length === 0) return tail.map(h => h.msg)
+
+  // Pick the highest-importance turns from the head, restoring chronological order
+  const sorted = [...head].sort((a, b) => b.score - a.score)
+  const selected = sorted
+    .slice(0, slots)
+    .sort((a, b) => head.indexOf(a) - head.indexOf(b))
+
+  return [...selected.map(h => h.msg), ...tail.map(h => h.msg)]
 }
 
 // ── Offline fallback replies ──────────────────────────────────────────────────
@@ -62,8 +104,8 @@ export const useSeolStore = defineStore('seol', () => {
   const turns = ref<ChatTurn[]>([])
   const isGenerating = ref(false)
 
-  // Short LLM context window (last 3 user+assistant pairs)
-  const llmHistory = ref<ChatMessage[]>([])
+  // v10 RIW: importance-weighted LLM history pool (scored messages)
+  const llmHistory = ref<ScoredMessage[]>([])
 
   // ── Actions ────────────────────────────────────────────────────────────────
 
@@ -99,9 +141,14 @@ export const useSeolStore = defineStore('seol', () => {
     // v8: memory-based self-correction (blend back to pre-spike state on JK)
     nextState = selfCorrect(nextState, text, prevState)
     nextState = homeostasisTick(nextState)
+    // v10: circadian rhythm modulation
+    nextState = circadianTick(nextState)
 
     bioState.value = nextState
     lastBioState.value = prevState
+
+    // v10 RIW: compute importance for this turn
+    const impScore = importanceScore(nextState, command)
 
     // 2. Push user turn
     const stamp = Date.now().toString()
@@ -111,6 +158,7 @@ export const useSeolStore = defineStore('seol', () => {
       content: text,
       command,
       mode: mode.value,
+      importance: impScore,
     })
 
     // 3. Push placeholder SEOL turn (will be filled while streaming)
@@ -121,6 +169,7 @@ export const useSeolStore = defineStore('seol', () => {
       content: '',
       mode: mode.value,
       streaming: true,
+      importance: impScore,
     })
 
     isGenerating.value = true
@@ -133,7 +182,7 @@ export const useSeolStore = defineStore('seol', () => {
         mode.value,
         bioState.value,
         emotionalSummary(bioState.value),
-        llmHistory.value,
+        buildRiwHistory(llmHistory.value),
         text,
       )) {
         accumulated += chunk
@@ -152,12 +201,12 @@ export const useSeolStore = defineStore('seol', () => {
       turns.value[seolIdx].content = cleaned
       turns.value[seolIdx].streaming = false
 
-      // Keep last 3 pairs (6 messages) in LLM context
-      llmHistory.value = ([
+      // v10 RIW: add both messages to the scored pool, capped at MAX_HISTORY_POOL
+      llmHistory.value = [
         ...llmHistory.value,
-        { role: 'user' as const,      content: text },
-        { role: 'assistant' as const, content: cleaned },
-      ] satisfies ChatMessage[]).slice(-6)
+        { msg: { role: 'user' as const,      content: text },   score: impScore },
+        { msg: { role: 'assistant' as const, content: cleaned }, score: impScore },
+      ].slice(-MAX_HISTORY_POOL)
     }
   }
 

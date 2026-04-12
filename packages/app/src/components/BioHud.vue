@@ -24,16 +24,24 @@
       🎭 {{ store.currentEmotion }}
       <span class="intensity">{{ (store.emotionIntensity * 100).toFixed(0) }}%</span>
     </div>
+    <div class="hud-circadian">
+      {{ circadianEmoji }} {{ circadianLabel }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { BioChannel } from '../composables/useBioState'
 import { BIO_CHANNELS } from '../composables/useBioState'
+import { circadianPhaseEmoji, circadianPhaseLabel } from '../composables/useCircadian'
 import { useSeolStore } from '../stores/seol'
 
 const store = useSeolStore()
 const channels: BioChannel[] = BIO_CHANNELS
+
+const circadianLabel = computed(() => circadianPhaseLabel())
+const circadianEmoji = computed(() => circadianPhaseEmoji(circadianLabel.value))
 
 function channelColor(ch: BioChannel, val: number): string {
   // positive channels → green-ish; stress channels → red-ish
@@ -120,5 +128,12 @@ function channelColor(ch: BioChannel, val: number): string {
 .intensity {
   font-size: 11px;
   opacity: 0.55;
+}
+
+.hud-circadian {
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: 0.50;
+  letter-spacing: 0.03em;
 }
 </style>
