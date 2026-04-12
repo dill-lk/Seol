@@ -1,4 +1,20 @@
 !!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
+AND WE USE OUR VIRTUAL CHARACTER AS PROJECT AiRI https://github.com/moeru-ai/airi use it lets start coding now
 
 pls read chat with @gemini below then go to /raw/agents.md 
 
