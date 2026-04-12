@@ -1,0 +1,12 @@
+{
+  "name": "seol",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm -w packages/app run dev",
+    "build": "npm -w packages/app run build",
+    "typecheck": "npm -w packages/app run typecheck"
+  }
+}
