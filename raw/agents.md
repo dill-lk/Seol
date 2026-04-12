@@ -1,4 +1,9 @@
 # SEOL Artificial Feelings — Experiment Log
+!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust
+!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust
+!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust
+!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust
+!!ALL RESERCHES DONE OUR V8 IPYNB will turn into ai conatiner code it in typescript js and rust
 
 This file is the **agent-maintained changelog** for model iterations and test outcomes.
 Everytime you create new version of .ipynb you must read and fully undestand 3 older verisons of it befor create new version never delete the style of them
