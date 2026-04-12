@@ -36,7 +36,7 @@ engine to life through **Project AiRI's VRM 3-D character system**.
 
 ```bash
 OLLAMA_ORIGINS='*' ollama serve
-ollama pull mistral     # or llama3.2, solar, etc.
+ollama pull mistral     # or llama3, solar, etc.
 ```
 
 ### 2 — Start the app
