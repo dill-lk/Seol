@@ -1,18 +1,22 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import {
+  allostasisTick,
   applyCommand,
   classifyCommand,
   emotionalSummary,
+  emotionalValence,
   feelingIntensity,
+  hebbianUpdate,
   homeostasisTick,
   importanceScore,
   initialBioState,
+  initialSynapticState,
   modeToEmotion,
   resolveMode,
   selfCorrect,
 } from '../composables/useBioState'
-import type { BioState, Command, SEOLMode, VRMEmotion } from '../composables/useBioState'
+import type { BioState, Command, SEOLMode, SynapticState, VRMEmotion } from '../composables/useBioState'
 import { circadianTick } from '../composables/useCircadian'
 import type { ChatMessage } from '../composables/useOllama'
 import { cleanResponse, streamChat } from '../composables/useOllama'
@@ -92,6 +96,16 @@ export const useSeolStore = defineStore('seol', () => {
   const alertStreak = ref(0)
   const lastBioState = ref<BioState | undefined>(undefined)
 
+  // v10b: Hebbian synaptic sensitivity state
+  const synapticState = ref<SynapticState>(initialSynapticState())
+
+  // v10b: allostatic load — rolling average of cortisol over last 8 turns
+  const cortisolHistory = ref<number[]>([])
+  const allostaticLoad = computed<number>(() => {
+    if (cortisolHistory.value.length === 0) return 0.5
+    return cortisolHistory.value.reduce((a, b) => a + b, 0) / cortisolHistory.value.length
+  })
+
   // Derived: mode and emotion — computed from bio-state
   const mode = computed<SEOLMode>(() => resolveMode(bioState.value))
   const emotionState = computed(() => modeToEmotion(mode.value, bioState.value))
@@ -99,6 +113,8 @@ export const useSeolStore = defineStore('seol', () => {
   const emotionIntensity = computed<number>(() => emotionState.value.intensity)
   // v8: overall bio-state intensity (used by VrmViewer / BioHud)
   const bioIntensity = computed<number>(() => feelingIntensity(bioState.value))
+  // v10b: emotional valence [-1..+1]
+  const valence = computed<number>(() => emotionalValence(bioState.value))
 
   // Chat
   const turns = ref<ChatTurn[]>([])
@@ -126,7 +142,8 @@ export const useSeolStore = defineStore('seol', () => {
       alertStreak.value = 0
     }
 
-    let nextState = applyCommand(bioState.value, command)
+    // v10b: applyCommand now uses synaptic sensitivity + negativity bias internally
+    let nextState = applyCommand(bioState.value, command, synapticState.value)
 
     // v8: trauma amplification — if on an alert streak, extra cortisol/adrenaline spike
     if (alertStreak.value >= 2 && (command === 'Alert' || command === 'Anger')) {
@@ -143,6 +160,14 @@ export const useSeolStore = defineStore('seol', () => {
     nextState = homeostasisTick(nextState)
     // v10: circadian rhythm modulation
     nextState = circadianTick(nextState)
+    // v10b: allostatic load — HPA axis sensitization under chronic stress
+    nextState = allostasisTick(nextState, allostaticLoad.value)
+
+    // v10b: track cortisol history for allostatic load (rolling window of 8 turns)
+    cortisolHistory.value = [...cortisolHistory.value, nextState.cortisol].slice(-8)
+
+    // v10b: Hebbian LTP/LTD — update synaptic sensitivity from this turn's activation
+    synapticState.value = hebbianUpdate(synapticState.value, nextState)
 
     bioState.value = nextState
     lastBioState.value = prevState
@@ -181,7 +206,7 @@ export const useSeolStore = defineStore('seol', () => {
         settings.ollamaModel,
         mode.value,
         bioState.value,
-        emotionalSummary(bioState.value),
+        emotionalSummary(bioState.value, allostaticLoad.value),
         buildRiwHistory(llmHistory.value),
         text,
       )) {
@@ -216,6 +241,8 @@ export const useSeolStore = defineStore('seol', () => {
     bioState.value = initialBioState()
     alertStreak.value = 0
     lastBioState.value = undefined
+    synapticState.value = initialSynapticState()
+    cortisolHistory.value = []
   }
 
   return {
@@ -224,6 +251,9 @@ export const useSeolStore = defineStore('seol', () => {
     currentEmotion,
     emotionIntensity,
     bioIntensity,
+    valence,
+    synapticState,
+    allostaticLoad,
     turns,
     isGenerating,
     sendMessage,
