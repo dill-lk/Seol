@@ -8,5 +8,8 @@
     "dev": "npm -w packages/app run dev",
     "build": "npm -w packages/app run build",
     "typecheck": "npm -w packages/app run typecheck"
+  },
+  "devDependencies": {
+    "electron": "41.0.0"
   }
 }
